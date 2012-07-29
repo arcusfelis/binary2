@@ -1,39 +1,83 @@
 -module(binary2).
--export([ delimit/2
-        , first/2
-        , atom_to_binary/1
-        , reverse/1
+-export([ reverse/1
         , union/2
         , subtract/2
         , intersection/2
         , inverse/1
+        , rtrim/1
+        , rtrim/2
+        , ltrim/1
+        , ltrim/2
+        , trim/1
+        , trim/2
         ]).
 
 
-delimit(Bin, Byte) when is_binary(Bin), is_integer(Byte) ->
-    Idx = first(Bin, Byte),
-    <<H:Idx/binary, _, T/binary>> = Bin,
-    {H, T}.
+rtrim(B) ->
+    S = byte_size(B),
+    do_rtrim(S, B, 0).
 
 
-first(Bin, Byte) when is_binary(Bin), is_integer(Byte) ->
-    do_first(Bin, Byte, 0).
+rtrim(B, X) ->
+    S = byte_size(B),
+    do_rtrim(S, B, X).
 
-do_first(<<X, T/binary>>, Byte, Idx) ->
-    case X of
-    Byte -> Idx;
-    _    -> do_first(T, Byte, Idx+1)
+
+do_rtrim(0, _B, _X) ->
+    <<>>;
+do_rtrim(S, B, X) ->
+    S2 = S - 1,
+    case binary:at(B, S2) of
+        X -> do_rtrim(S2, B, X);
+        _ -> binary_part(B, 0, S)
     end.
 
 
-atom_to_binary(Atom) when is_atom(Atom) ->
-    list_to_binary(atom_to_list(Atom)).
+ltrim(B) ->
+    ltrim(B, 0).
+
+
+ltrim(<<X, B/binary>>, X) ->
+    ltrim(B, X);
+ltrim(B, _X) ->
+    B.
+
+
+trim(B) ->
+    trim(B, 0).
+
+
+trim(B, X) ->
+    From = ltrimc(B, X, 0),
+    case byte_size(B) of
+        From ->
+            <<>>;
+        S ->
+            To = do_rtrimc(S, B, X),
+            binary_part(B, From, To)
+    end.
+
+
+ltrimc(<<X, B/binary>>, X, C) ->
+    ltrimc(B, X, C+1);
+ltrimc(_B, _X, C) ->
+    C.
+
+
+do_rtrimc(0, _B, _X) ->
+    0;
+do_rtrimc(S, B, X) ->
+    S2 = S - 1,
+    case binary:at(B, S2) of
+        X -> do_rtrim(S2, B, X);
+        _ -> S
+    end.
 
 
 reverse(Bin) when is_binary(Bin) ->
     S = size(Bin),
     <<V:S/integer-little>> = Bin,
-    <<V:S/integer-big>>. 
+    <<V:S/integer-big>>.
 
 
 union(B1, B2) ->
