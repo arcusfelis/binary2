@@ -1,17 +1,21 @@
 -module(binary2).
+
+%% Bits
 -export([ reverse/1
         , union/2
         , subtract/2
         , intersection/2
         , inverse/1
-        , rtrim/1
+        ]).
+
+%% Trimming
+-export([ rtrim/1
         , rtrim/2
         , ltrim/1
         , ltrim/2
         , trim/1
         , trim/2
         ]).
-
 
 rtrim(B) ->
     S = byte_size(B),
@@ -54,7 +58,7 @@ trim(B, X) ->
             <<>>;
         S ->
             To = do_rtrimc(S, B, X),
-            binary_part(B, From, To)
+            binary:part(B, From, To - From)
     end.
 
 
@@ -69,19 +73,20 @@ do_rtrimc(0, _B, _X) ->
 do_rtrimc(S, B, X) ->
     S2 = S - 1,
     case binary:at(B, S2) of
-        X -> do_rtrim(S2, B, X);
+        X -> do_rtrimc(S2, B, X);
         _ -> S
     end.
 
 
+%% Reverse bytes.
 reverse(Bin) when is_binary(Bin) ->
-    S = size(Bin),
+    S = bit_size(Bin),
     <<V:S/integer-little>> = Bin,
     <<V:S/integer-big>>.
 
 
 union(B1, B2) ->
-    S = size(B1),
+    S = bit_size(B1),
     <<V1:S>> = B1,
     <<V2:S>> = B2,
     V3 = V1 bor V2,
@@ -89,7 +94,7 @@ union(B1, B2) ->
 
 
 subtract(B1, B2) ->
-    S = size(B1),
+    S = bit_size(B1),
     <<V1:S>> = B1,
     <<V2:S>> = B2,
     V3 = (V1 bxor V2) band V1,
@@ -97,7 +102,7 @@ subtract(B1, B2) ->
 
 
 intersection(B1, B2) ->
-    S = size(B1),
+    S = bit_size(B1),
     <<V1:S>> = B1,
     <<V2:S>> = B2,
     V3 = V1 band V2,
@@ -105,9 +110,31 @@ intersection(B1, B2) ->
 
 
 inverse(B1) ->
-    S = size(B1),
+    S = bit_size(B1),
     <<V1:S>> = B1,
-    V2 = not V1,
+    V2 = bnot V1,
     <<V2:S>>.
 
 
+-include_lib("eunit/include/eunit.hrl").
+
+-ifdef(TEST).
+
+trim1_test_() ->
+    [ ?_assertEqual(trim(<<>>), <<>>)
+    , ?_assertEqual(trim(<<0,1,2>>), <<1,2>>)
+    , ?_assertEqual(trim(<<0,0,1,2>>), <<1,2>>)
+    , ?_assertEqual(trim(<<1,2,0,0>>), <<1,2>>)
+    , ?_assertEqual(trim(<<0,1,2,0>>), <<1,2>>)
+    , ?_assertEqual(trim(<<0,0,0,1,2,0,0,0>>), <<1,2>>)
+    ].
+
+reverse_test_() ->
+    [ ?_assertEqual(reverse(<<0,1,2>>), <<2,1,0>>)
+    ].
+
+inverse_test_() ->
+    [ ?_assertEqual(inverse(inverse(<<0,1,2>>)), <<0,1,2>>)
+    ].
+
+-endif.
