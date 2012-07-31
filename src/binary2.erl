@@ -1,8 +1,14 @@
 -module(binary2).
 
-%% Bits
+%% Bytes
 -export([ reverse/1
-        , union/2
+        , join/2
+        , suffix/2
+        , prefix/2
+        ]).
+
+%% Bits
+-export([ union/2
         , subtract/2
         , intersection/2
         , inverse/1
@@ -17,7 +23,7 @@
         , trim/2
         ]).
 
-rtrim(B) ->
+rtrim(B) when is_binary(B) ->
     S = byte_size(B),
     do_rtrim(S, B, 0).
 
@@ -37,7 +43,7 @@ do_rtrim(S, B, X) ->
     end.
 
 
-ltrim(B) ->
+ltrim(B) when is_binary(B) ->
     ltrim(B, 0).
 
 
@@ -47,7 +53,7 @@ ltrim(B, _X) ->
     B.
 
 
-trim(B) ->
+trim(B) when is_binary(B) ->
     trim(B, 0).
 
 
@@ -78,11 +84,28 @@ do_rtrimc(S, B, X) ->
     end.
 
 
-%% Reverse bytes.
+%% @doc Reverse the bytes' order.
 reverse(Bin) when is_binary(Bin) ->
     S = bit_size(Bin),
     <<V:S/integer-little>> = Bin,
     <<V:S/integer-big>>.
+
+
+join([B|Bs], Sep) when is_binary(Sep) ->
+    R = << <<Sep/binary, X/binary>> || X <- Bs >>,
+    <<B/binary, R/binary>>;
+
+join([], _Sep) ->
+    <<>>.
+
+
+prefix(B, L) when is_binary(B), is_integer(L), L > 0 ->
+    binary:part(B, 0, L).
+
+
+suffix(B, L) when is_binary(B), is_integer(L), L > 0 ->
+    S = byte_size(B),
+    binary:part(B, S-L, L).
 
 
 union(B1, B2) ->
@@ -135,6 +158,20 @@ reverse_test_() ->
 
 inverse_test_() ->
     [ ?_assertEqual(inverse(inverse(<<0,1,2>>)), <<0,1,2>>)
+    ].
+
+join_test_() ->
+    [ ?_assertEqual(join([<<1,2>>, <<3,4>>, <<5,6>>], <<0>>), <<1,2,0,3,4,0,5,6>>)
+    ].
+
+suffix_test_() ->
+    [ ?_assertEqual(suffix(<<1,2,3,4,5>>, 2), <<4,5>>)
+    , ?_assertError(badarg, prefix(<<1,2,3,4,5>>, 25))
+    ].
+
+prefix_test_() ->
+    [ ?_assertEqual(prefix(<<1,2,3,4,5>>, 2), <<1,2>>)
+    , ?_assertError(badarg, prefix(<<1,2,3,4,5>>, 25))
     ].
 
 -endif.
