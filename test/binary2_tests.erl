@@ -1,4 +1,4 @@
--module(binary_tests).
+-module(binary2_tests).
 
 -import(binary2, [trim/1, reverse/1, inverse/1, join/2, suffix/2, prefix/2]).
 
