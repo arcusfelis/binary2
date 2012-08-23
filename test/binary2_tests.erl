@@ -1,6 +1,6 @@
 -module(binary2_tests).
 
--import(binary2, [trim/1, trim/2, ltrim/2, rtrim/2,
+-import(binary2, [trim/1, ltrim/1, rtrim/1, trim/2, ltrim/2, rtrim/2,
                   reverse/1, inverse/1, join/2, suffix/2, prefix/2,
                   union/2, intersection/2, subtract/2]).
 
@@ -10,11 +10,35 @@
 
 trim1_test_() ->
     [ ?_assertEqual(trim(<<>>), <<>>)
+    , ?_assertEqual(trim(<<0,0,0>>), <<>>)
+    , ?_assertEqual(trim(<<1,2,3>>), <<1,2,3>>)
     , ?_assertEqual(trim(<<0,1,2>>), <<1,2>>)
     , ?_assertEqual(trim(<<0,0,1,2>>), <<1,2>>)
     , ?_assertEqual(trim(<<1,2,0,0>>), <<1,2>>)
     , ?_assertEqual(trim(<<0,1,2,0>>), <<1,2>>)
     , ?_assertEqual(trim(<<0,0,0,1,2,0,0,0>>), <<1,2>>)
+    ].
+
+ltrim1_test_() ->
+    [ ?_assertEqual(ltrim(<<>>), <<>>)
+    , ?_assertEqual(ltrim(<<0,0,0>>), <<>>)
+    , ?_assertEqual(ltrim(<<1,2,3>>), <<1,2,3>>)
+    , ?_assertEqual(ltrim(<<0,1,2>>), <<1,2>>)
+    , ?_assertEqual(ltrim(<<0,0,1,2>>), <<1,2>>)
+    , ?_assertEqual(ltrim(<<1,2,0,0>>), <<1,2,0,0>>)
+    , ?_assertEqual(ltrim(<<0,1,2,0>>), <<1,2,0>>)
+    , ?_assertEqual(ltrim(<<0,0,0,1,2,0,0,0>>), <<1,2,0,0,0>>)
+    ].
+
+rtrim1_test_() ->
+    [ ?_assertEqual(rtrim(<<>>), <<>>)
+    , ?_assertEqual(rtrim(<<1,2,3>>), <<1,2,3>>)
+    , ?_assertEqual(rtrim(<<0,0,0>>), <<>>)
+    , ?_assertEqual(rtrim(<<0,1,2>>), <<0,1,2>>)
+    , ?_assertEqual(rtrim(<<0,0,1,2>>), <<0,0,1,2>>)
+    , ?_assertEqual(rtrim(<<1,2,0,0>>), <<1,2>>)
+    , ?_assertEqual(rtrim(<<0,1,2,0>>), <<0,1,2>>)
+    , ?_assertEqual(rtrim(<<0,0,0,1,2,0,0,0>>), <<0,0,0,1,2>>)
     ].
 
 trim2_test_() ->
@@ -46,6 +70,9 @@ join_test_() ->
                     <<"abc|def|xyz">>)
     , ?_assertEqual(join([<<>>, <<"|">>, <<"x|z">>], <<"|">>),
                     <<"|||x|z">>)
+    , ?_assertEqual(join([<<"abc">>, <<"def">>, <<"xyz">>], <<>>),
+                    <<"abcdefxyz">>)
+    , ?_assertEqual(join([], <<"|">>), <<>>)
     ].
 
 suffix_test_() ->

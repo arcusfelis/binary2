@@ -74,8 +74,9 @@ ltrimc(_B, _X, C) ->
     C.
 
 
-do_rtrimc(0, _B, _X) ->
-    0;
+% This clause will never be matched.
+%do_rtrimc(0, _B, _X) ->
+%    0;
 do_rtrimc(S, B, X) ->
     S2 = S - 1,
     case binary:at(B, S2) of
