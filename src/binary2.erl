@@ -93,12 +93,17 @@ reverse(Bin) when is_binary(Bin) ->
     <<V:S/integer-big>>.
 
 
-join([B|Bs], Sep) when is_binary(Sep) ->
-    R = [ [Sep, X] || X <- Bs ],
-    iolist_to_binary([B, R]);
+join([B|Bs], Sep) when is_binary(Sep) ->                
+    iolist_to_binary([B|add_separator(Bs, Sep)]);        
+                                                         
+join([], _Sep) ->                                       
+    <<>>.                                                
+                                                         
+add_separator([B|Bs], Sep) ->                               
+    [Sep, B | add_separator(Bs, Sep)];                        
+add_separator([], _) ->                                  
+    [].                                                  
 
-join([], _Sep) ->
-    <<>>.
 
 
 
