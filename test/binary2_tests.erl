@@ -2,6 +2,7 @@
 
 -import(binary2, [trim/1, ltrim/1, rtrim/1, trim/2, ltrim/2, rtrim/2,
                   reverse/1, inverse/1, join/2, suffix/2, prefix/2,
+                  duplicate/2,
                   union/2, intersection/2, subtract/2]).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -73,6 +74,11 @@ join_test_() ->
     , ?_assertEqual(join([<<"abc">>, <<"def">>, <<"xyz">>], <<>>),
                     <<"abcdefxyz">>)
     , ?_assertEqual(join([], <<"|">>), <<>>)
+    ].
+
+duplicate_test_() ->
+    [ ?_assertEqual(duplicate(5, <<1,2>>), <<1,2, 1,2, 1,2, 1,2, 1,2>>)
+    , ?_assertEqual(duplicate(50, <<0>>), <<0:400>>)
     ].
 
 suffix_test_() ->

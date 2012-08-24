@@ -3,6 +3,7 @@
 %% Bytes
 -export([ reverse/1
         , join/2
+        , duplicate/2
         , suffix/2
         , prefix/2
         ]).
@@ -93,11 +94,16 @@ reverse(Bin) when is_binary(Bin) ->
 
 
 join([B|Bs], Sep) when is_binary(Sep) ->
-    R = << <<Sep/binary, X/binary>> || X <- Bs >>,
-    <<B/binary, R/binary>>;
+    R = [ [Sep, X] || X <- Bs ],
+    iolist_to_binary([B, R]);
 
 join([], _Sep) ->
     <<>>.
+
+
+
+duplicate(C, B) ->
+    iolist_to_binary(lists:duplicate(C, B)).
 
 
 prefix(B, L) when is_binary(B), is_integer(L), L > 0 ->
