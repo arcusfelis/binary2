@@ -9,4 +9,4 @@ This library contains useful functions for manipulating binaries.
 
 .. image:: https://secure.travis-ci.org/freeakk/binary2.png?branch=master
     :alt: Build Status
-    :target: <http://travis-ci.org/freeakk/binary2>
+    :target: http://travis-ci.org/freeakk/binary2
