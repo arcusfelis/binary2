@@ -49,6 +49,7 @@ Trimming:
 Bit-sets:
 
 .. code-block:: erlang
+
     21> binary2:inverse(<<-1:7>>).
     <<0:7>>
     22> binary2:inverse(<<0:7>>). 
