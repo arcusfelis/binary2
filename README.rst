@@ -5,11 +5,11 @@ This library contains useful functions for manipulating binaries.
 
 **License**: MIT
 
-**Author**: Uvarov Michael (freeakk@gmail.com)
+**Author**: Uvarov Michael (cytozoon@gmail.com)
 
-.. image:: https://secure.travis-ci.org/freeakk/binary2.png?branch=master
+.. image:: https://secure.travis-ci.org/cytozoon/binary2.png?branch=master
     :alt: Build Status
-    :target: http://travis-ci.org/freeakk/binary2
+    :target: http://travis-ci.org/cytozoon/binary2
 
 
 Examples

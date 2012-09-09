@@ -105,8 +105,7 @@ add_separator([], _) ->
     [].                                                  
 
 
-
-
+%% @doc Repeat the binary `B' `C' times.
 duplicate(C, B) ->
     iolist_to_binary(lists:duplicate(C, B)).
 
