@@ -24,14 +24,62 @@
         , trim/2
         ]).
 
-rtrim(B) when is_binary(B) ->
-    S = byte_size(B),
-    do_rtrim(S, B, 0).
+
+trim(B)  -> trim(B, 0).
+ltrim(B) -> ltrim(B, 0).
+rtrim(B) -> rtrim(B, 0).
 
 
-rtrim(B, X) ->
+rtrim(B, X) when is_binary(B), is_integer(X) ->
     S = byte_size(B),
-    do_rtrim(S, B, X).
+    do_rtrim(S, B, X);
+rtrim(B, [_|_]=Xs) when is_binary(B) ->
+    S = byte_size(B),
+    do_mrtrim(S, B, Xs).
+
+
+ltrim(B, X) when is_binary(B), is_integer(X) ->
+    do_ltrim(B, X);
+ltrim(B, [_|_]=Xs) when is_binary(B) ->
+    do_mltrim(B, Xs).
+
+
+%% @doc The second element is a single integer element or an ordset of elements.
+trim(B, X) when is_binary(B), is_integer(X) ->
+    From = ltrimc(B, X, 0),
+    case byte_size(B) of
+        From ->
+            <<>>;
+        S ->
+            To = do_rtrimc(S, B, X),
+            binary:part(B, From, To - From)
+    end;
+trim(B, [_|_]=Xs) when is_binary(B) ->
+    From = mltrimc(B, Xs, 0),
+    case byte_size(B) of
+        From ->
+            <<>>;
+        S ->
+            To = do_mrtrimc(S, B, Xs),
+            binary:part(B, From, To - From)
+    end.
+
+
+
+do_ltrim(<<X, B/binary>>, X) ->
+    do_ltrim(B, X);
+do_ltrim(B, _X) ->
+    B.
+
+
+%% multi, left trimming.
+do_mltrim(<<X, B/binary>> = XB, Xs) ->
+    case ordsets:is_element(X, Xs) of
+        true  -> do_mltrim(B, Xs);
+        false -> XB
+    end;
+do_mltrim(<<>>, _Xs) ->
+    <<>>.
 
 
 do_rtrim(0, _B, _X) ->
@@ -44,34 +92,31 @@ do_rtrim(S, B, X) ->
     end.
 
 
-ltrim(B) when is_binary(B) ->
-    ltrim(B, 0).
-
-
-ltrim(<<X, B/binary>>, X) ->
-    ltrim(B, X);
-ltrim(B, _X) ->
-    B.
-
-
-trim(B) when is_binary(B) ->
-    trim(B, 0).
-
-
-trim(B, X) ->
-    From = ltrimc(B, X, 0),
-    case byte_size(B) of
-        From ->
-            <<>>;
-        S ->
-            To = do_rtrimc(S, B, X),
-            binary:part(B, From, To - From)
+%% Multiple version of do_rtrim.
+do_mrtrim(0, _B, _Xs) ->
+    <<>>;
+do_mrtrim(S, B, Xs) ->
+    S2 = S - 1,
+    X = binary:at(B, S2),
+    case ordsets:is_element(X, Xs) of
+        true  -> do_mrtrim(S2, B, Xs);
+        false -> binary_part(B, 0, S)
     end.
 
 
 ltrimc(<<X, B/binary>>, X, C) ->
     ltrimc(B, X, C+1);
 ltrimc(_B, _X, C) ->
+    C.
+
+
+%% multi, left trimming, returns a count of matched bytes from the left.
+mltrimc(<<X, B/binary>>, Xs, C) ->
+    case ordsets:is_element(X, Xs) of
+        true  -> mltrimc(B, Xs, C+1);
+        false -> C
+    end;
+mltrimc(<<>>, _Xs, C) ->
     C.
 
 
@@ -83,6 +128,15 @@ do_rtrimc(S, B, X) ->
     case binary:at(B, S2) of
         X -> do_rtrimc(S2, B, X);
         _ -> S
+    end.
+
+
+do_mrtrimc(S, B, Xs) ->
+    S2 = S - 1,
+    X = binary:at(B, S2),
+    case ordsets:is_element(X, Xs) of
+        true  -> do_mrtrimc(S2, B, Xs);
+        false -> S
     end.
 
 

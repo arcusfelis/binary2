@@ -60,6 +60,32 @@ rtrim2_test_() ->
     , ?_assertEqual(rtrim(<<5,5,5,1,2,0,0,0>>, 5), <<5,5,5,1,2,0,0,0>>)
     ].
 
+
+
+mtrim2_test_() ->
+    [ ?_assertEqual(trim(<<5>>, [1,5]), <<>>)
+    , ?_assertEqual(trim(<<5,1,2,5>>, [1,5]), <<2>>)
+    , ?_assertEqual(trim(<<5,1,2,5>>, [1,2,5]), <<>>)
+    , ?_assertEqual(trim(<<5,5,5,1,2,0,0,0>>, [1,5]), <<2,0,0,0>>)
+    ].
+
+mltrim2_test_() ->
+    [ ?_assertEqual(ltrim(<<5>>, [1,5]), <<>>)
+    , ?_assertEqual(ltrim(<<5,1,2,5>>, [1,5]), <<2,5>>)
+    , ?_assertEqual(ltrim(<<5,1,2,5>>, [2,5]), <<1,2,5>>)
+    , ?_assertEqual(ltrim(<<5,5,5,1,2,0,0,0>>, [1,5]), <<2,0,0,0>>)
+    ].
+
+mrtrim2_test_() ->
+    [ ?_assertEqual(rtrim(<<5>>, [1,5]), <<>>)
+    , ?_assertEqual(rtrim(<<5,1,2,5>>, [1,5]), <<5,1,2>>)
+    , ?_assertEqual(rtrim(<<5,1,2,5>>, [2,5]), <<5,1>>)
+    , ?_assertEqual(rtrim(<<5,5,5,1,2,0,0,0>>, [1,5]), <<5,5,5,1,2,0,0,0>>)
+    , ?_assertEqual(rtrim(<<5,5,5,1,2,0,0,0>>, [0,5]), <<5,5,5,1,2>>)
+    ].
+
+
+
 reverse_test_() ->
     [ ?_assertEqual(reverse(<<0,1,2>>), <<2,1,0>>)
     ].
