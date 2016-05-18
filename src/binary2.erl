@@ -24,6 +24,13 @@
         , trim/2
         ]).
 
+%% Parsing
+-export([ bin_to_int/1
+        ]).
+
+%% Matching
+-export([ optimize_patterns/1
+        ]).
 
 trim(B)  -> trim(B, 0).
 ltrim(B) -> ltrim(B, 0).
@@ -202,3 +209,25 @@ inverse(B1) ->
     <<V1:S>> = B1,
     V2 = bnot V1,
     <<V2:S>>.
+
+%% @doc string:to_integer/1 for binaries
+bin_to_int(Bin) ->
+    bin_to_int(Bin, 0).
+
+bin_to_int(<<H, T/binary>>, X) when $0 =< H, H =< $9 ->
+    bin_to_int(T, (X*10)+(H-$0));
+bin_to_int(Bin, X) ->
+    {X, Bin}.
+
+%% Remove longer patterns if shorter pattern matches
+%% Useful to run before binary:compile_pattern/1
+optimize_patterns(Patterns) ->
+    Sorted = lists:usort(Patterns),
+    remove_long_duplicates(Sorted).
+
+remove_long_duplicates([H|T]) ->
+    %% match(Subject, Pattern)
+    DedupT = [X || X <- T, binary:match(X, H) =:= nomatch],
+    [H|remove_long_duplicates(DedupT)];
+remove_long_duplicates([]) ->
+    [].

@@ -3,7 +3,8 @@
 -import(binary2, [trim/1, ltrim/1, rtrim/1, trim/2, ltrim/2, rtrim/2,
                   reverse/1, inverse/1, join/2, suffix/2, prefix/2,
                   duplicate/2,
-                  union/2, intersection/2, subtract/2]).
+                  union/2, intersection/2, subtract/2,
+                  optimize_patterns/1]).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -144,6 +145,15 @@ subtract_test_() ->
     [ ?_assertEqual(subtract(<<2#0011011>>, 
                              <<2#1011110>>), 
                              <<2#0000001>>)
+    ].
+
+optimize_patterns_test_() ->
+    [ ?_assertEqual([<<"t">>],
+                    optimize_patterns([<<"t">>, <<"test">>])),
+      ?_assertEqual([<<"t">>],
+                    optimize_patterns([<<"t">>, <<"t">>, <<"test">>])),
+      ?_assertEqual([<<"t">>],
+                    optimize_patterns([<<"test">>, <<"t">>, <<"t">>]))
     ].
 
 -endif.
